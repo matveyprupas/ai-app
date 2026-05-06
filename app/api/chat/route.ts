@@ -1,14 +1,16 @@
 import { streamText, UIMessage, convertToModelMessages, tool } from 'ai';
-import { google } from "@ai-sdk/google";
+import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
-  console.log(messages.map(message => JSON.stringify(message.parts, null, 2)));
+  console.log(
+    messages.map((message) => JSON.stringify(message.parts, null, 2))
+  );
 
   const result = streamText({
-    model: google("gemini-2.5-flash-lite"),
+    model: google('gemini-2.5-flash-lite'),
     messages: await convertToModelMessages(messages),
 
     tools: {
@@ -27,8 +29,6 @@ export async function POST(req: Request) {
         },
       }),
     },
-
-
   });
 
   return result.toUIMessageStreamResponse();
