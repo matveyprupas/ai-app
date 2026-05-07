@@ -1,18 +1,20 @@
-import { streamText, UIMessage, convertToModelMessages, tool } from 'ai';
+import {
+  streamText,
+  UIMessage,
+  convertToModelMessages,
+  tool,
+  stepCountIs,
+} from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
-  console.log(
-    messages.map((message) => JSON.stringify(message.parts, null, 2))
-  );
-
   const result = streamText({
-    model: google('gemini-2.5-flash-lite'),
+    model: google('gemini-3.1-flash-lite-preview'),
     messages: await convertToModelMessages(messages),
-
+    stopWhen: stepCountIs(5),
     tools: {
       weather: tool({
         description: 'Get the weather in a location (fahrenheit)',
@@ -21,14 +23,30 @@ export async function POST(req: Request) {
         }),
         execute: async ({ location }) => {
           const temperature = Math.round(Math.random() * (90 - 32) + 32);
-
           return {
             location,
             temperature,
           };
         },
       }),
+      convertFahrenheitToCelsius: tool({
+        description: 'Convert a temperature in fahrenheit to celsius',
+        inputSchema: z.object({
+          temperature: z
+            .number()
+            .describe('The temperature in fahrenheit to convert'),
+        }),
+        execute: async ({ temperature }) => {
+          const celsius = Math.round((temperature - 32) * (5 / 9));
+          return {
+            celsius,
+          };
+        },
+      }),
     },
+    // onStepFinish: ({ toolResults }) => {
+    //   console.log(toolResults);
+    // },
   });
 
   return result.toUIMessageStreamResponse();
