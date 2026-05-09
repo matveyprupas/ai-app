@@ -1,0 +1,18 @@
+---
+description: General rules that always apply to every session
+alwaysApply: true
+---
+
+# General Rules
+
+## Git permissions
+
+NEVER run `git commit`, `git push`, `git rebase`, `git reset --hard`, `git merge`, or any other write/destructive git command unless the user **explicitly** requests it in the current message.
+
+Read-only git commands are allowed freely: `git status`, `git log`, `git diff`, `git show`, `git branch`.
+
+## Code changes
+
+- Always read a file before editing it
+- Do not add comments that only describe what the code does — comments should explain non-obvious intent or trade-offs
+- Fix linter errors you introduce; do not fix pre-existing ones unless asked
