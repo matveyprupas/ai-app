@@ -48,13 +48,13 @@ app/
 
 ```ts
 export interface WeatherDay {
-  date: string;       // ISO 8601: "2026-05-09T00:00:00Z"
-  celsius: number;    // daily max temperature
+  date: string; // ISO 8601: "2026-05-09T00:00:00Z"
+  celsius: number; // daily max temperature
   fahrenheit: number; // converted from celsius
 }
 
 export interface WeatherForecast {
-  location: string;   // canonical name returned by geocoding (e.g. "Moscow")
+  location: string; // canonical name returned by geocoding (e.g. "Moscow")
   days: WeatherDay[]; // always 5 entries
 }
 
@@ -98,6 +98,7 @@ GET https://api.open-meteo.com/v1/forecast
 Returns `{ daily: { time: string[], temperature_2m_max: number[] } }`.
 
 **Mapping:**
+
 - `time[i]` → `"${time[i]}T00:00:00Z"` (pad to full ISO 8601)
 - `temperature_2m_max[i]` → `celsius`
 - `celsius` → `fahrenheit` via `Math.round(celsius * 9/5 + 32)`
@@ -121,7 +122,7 @@ export const weatherProvider = new OpenMeteoProvider();
 - Tool `execute` becomes:
 
 ```ts
-execute: async ({ location }) => weatherProvider.getForecast(location)
+execute: async ({ location }) => weatherProvider.getForecast(location);
 ```
 
 - Update system prompt to instruct the model to normalize location names to canonical English before calling the tool:
@@ -156,11 +157,11 @@ const label = new Date(day.date).toLocaleDateString('ru-RU', {
 
 ## Error handling
 
-| Scenario | Behavior |
-|---|---|
+| Scenario                    | Behavior                                             |
+| --------------------------- | ---------------------------------------------------- |
 | City not found by geocoding | Tool returns error string; LLM relays it to the user |
-| Open-Meteo network error | `execute` throws; AI SDK surfaces it as a tool error |
-| Unexpected API shape | Adapter throws with a descriptive message |
+| Open-Meteo network error    | `execute` throws; AI SDK surfaces it as a tool error |
+| Unexpected API shape        | Adapter throws with a descriptive message            |
 
 ---
 
