@@ -5,6 +5,11 @@ import { useState } from 'react';
 
 import classnames from 'classnames';
 
+import {
+  WeatherWidget,
+  type WeatherWidgetProps,
+} from './components/WeatherWidget';
+
 export default function Chat() {
   const [input, setInput] = useState('');
   const { messages, sendMessage } = useChat();
@@ -26,13 +31,21 @@ export default function Chat() {
               switch (part.type) {
                 case 'text':
                   return <div key={`${message.id}-${i}`}>{part.text}</div>;
-                case 'tool-weather':
-                case 'tool-convertFahrenheitToCelsius':
-                  return (
-                    <pre key={`${message.id}-${i}`}>
-                      {JSON.stringify(part, null, 2)}
-                    </pre>
-                  );
+                case 'tool-weather': {
+                  const key = `${message.id}-${i}`;
+                  if (part.state !== 'output-available') {
+                    return (
+                      <p
+                        key={key}
+                        className="text-sm text-zinc-500 dark:text-zinc-400"
+                      >
+                        Loading weather…
+                      </p>
+                    );
+                  }
+                  const props = part.output as WeatherWidgetProps;
+                  return <WeatherWidget key={key} {...props} />;
+                }
               }
             })}
           </div>
